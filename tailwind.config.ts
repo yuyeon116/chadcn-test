@@ -42,6 +42,7 @@ const config: Config = {
 			palette: {
 			  'red' :'#F34040',
 			  'red-light' :'#FFE8E3',
+			  'red-dark': '#AA2D2D',
 			  'orange': '#FF8C00',
 			  'orange-light':'#FFEBD9',
 			  'yellow':'#FF8C00',
@@ -60,7 +61,7 @@ const config: Config = {
 		boxShadow: { 
 			'primary-input': '0px 0px 0px 3px rgba(149, 147, 240, 0.15)', // 컬러 커스텀 필요
 			'error-input': '0px 0px 0px 3px rgba(243, 64, 64, 0.15)',
-			
+			'inner': 'inset 0 0 0 1px #a4a9b1',			
 		},
 		spacing: {
 			'4.5': "1.125rem",
