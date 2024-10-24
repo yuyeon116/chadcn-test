@@ -1,9 +1,10 @@
-import { columns, Payment } from "@/shared/ui/columns";
+"use client";
+import { Button } from "@/components/ui/button";
+import { columns, Payment } from "@/shared/ui/Columns";
 import { DataTable } from "@/shared/ui/DataTable";
 
-async function getData(): Promise<Payment[]> {
-  // Fetch data from your API here.
-  return [
+export default function DemoPage() {
+  const data: Payment[] = [
     {
       id: "728ed52f",
       amount: 400,
@@ -29,14 +30,13 @@ async function getData(): Promise<Payment[]> {
       email: "sdf23qfsa@example.com",
     },
   ];
-}
-
-export default async function DemoPage() {
-  const data = await getData();
 
   return (
     <div className="container mx-auto py-10">
       <DataTable columns={columns} data={data} />
+      <Button variant="outline" onClick={() => console.log("선택")}>
+        선택
+      </Button>
     </div>
   );
 }

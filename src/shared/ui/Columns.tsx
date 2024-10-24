@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import SortingButton from "@/components/ui/notice/SortingButton";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -18,42 +17,46 @@ export const columns: ColumnDef<Payment>[] = [
     accessorKey: "status",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Status
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <SortingButton
+          buttonText="Status"
+          isSorted={column.getIsSorted()}
+          toggleSorting={column.toggleSorting}
+          clearSorting={column.clearSorting}
+        />
       );
     },
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("status")}</div>
+    ),
   },
   {
     accessorKey: "email",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Email
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <SortingButton
+          buttonText="Email"
+          isSorted={column.getIsSorted()}
+          toggleSorting={column.toggleSorting}
+          clearSorting={column.clearSorting}
+        />
       );
     },
+    cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
   },
   {
     accessorKey: "amount",
     header: ({ column }) => {
       return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Amount
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        <SortingButton
+          buttonText="Amount"
+          clearSorting={column.clearSorting}
+          toggleSorting={column.toggleSorting}
+          isSorted={column.getIsSorted()}
+        />
       );
     },
+    cell: ({ row }) => (
+      <div className="lowercase">{row.getValue("amount")}</div>
+    ),
   },
 ];
