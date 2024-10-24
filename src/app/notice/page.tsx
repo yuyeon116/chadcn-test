@@ -2,8 +2,12 @@
 import { Button } from "@/components/ui/button";
 import { columns, Payment } from "@/shared/ui/Columns";
 import { DataTable } from "@/shared/ui/DataTable";
+import { RowSelectionState } from "@tanstack/react-table";
+import { useState } from "react";
 
 export default function DemoPage() {
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
   const data: Payment[] = [
     {
       id: "728ed52f",
@@ -33,8 +37,13 @@ export default function DemoPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <DataTable columns={columns} data={data} />
-      <Button variant="outline" onClick={() => console.log("선택")}>
+      <DataTable
+        columns={columns}
+        data={data}
+        rowSelection={rowSelection}
+        setRowSelection={setRowSelection}
+      />
+      <Button variant="outline" onClick={() => console.log(rowSelection)}>
         선택
       </Button>
     </div>
