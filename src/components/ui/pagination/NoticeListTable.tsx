@@ -19,21 +19,22 @@ export default function NoticeListTable() {
       return queryClient.getQueryData(["pageData", pageNumber]);
     },
     staleTime: 5000,
+    placeholderData: (previous) => previous,
   });
 
   // 페이지 번호에 따라 추가 데이터 로딩
-  const { data: additionalData, isLoading: isAdditionalLoading } =
-    useQuery<TData>({
-      queryKey: ["pageData", pageNumber],
-      queryFn: async () => {
-        const response = await fetch(
-          `http://date.jsontest.com/?page=${pageNumber}`
-        );
-        return response.json();
-      },
-      enabled: pageNumber > 1,
-      staleTime: 5000,
-    });
+  const { data: additionalData } = useQuery<TData>({
+    queryKey: ["pageData", pageNumber],
+    queryFn: async () => {
+      const response = await fetch(
+        `http://date.jsontest.com/?page=${pageNumber}`
+      );
+      return response.json();
+    },
+    enabled: pageNumber > 1,
+    staleTime: 5000,
+    placeholderData: (previous) => previous,
+  });
 
   const handlePageChange = (page: number) => {
     setPageNumber(page);
@@ -53,18 +54,13 @@ export default function NoticeListTable() {
       )}
 
       {/* Render additional data for other pages */}
-      {pageNumber > 1 &&
-        (isAdditionalLoading ? (
-          <div>Loading additional data...</div>
-        ) : (
-          additionalData && (
-            <div>
-              <h1>{additionalData.date}</h1>
-              <p>{additionalData.time}</p>
-              <p>{additionalData.milliseconds_since_epoch}</p>
-            </div>
-          )
-        ))}
+      {pageNumber > 1 && additionalData && (
+        <div>
+          <h1>{additionalData.date}</h1>
+          <p>{additionalData.time}</p>
+          <p>{additionalData.milliseconds_since_epoch}</p>
+        </div>
+      )}
 
       <hr />
       <div>
