@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TData } from "@/types/data-type";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -9,25 +9,8 @@ export default function NoticeListTable() {
 
   const [pageNumber, setPageNumber] = useState<number | undefined>(undefined);
 
-  // 초기 데이터 로딩
-  const { data: initialData, isLoading: isInitialLoading } = useQuery<TData>({
-    queryKey: ["initialData"],
-    queryFn: async () => {
-      const response = await fetch("http://date.jsontest.com/");
-      return response.json();
-    },
-    initialData: () => {
-      if (typeof window === "undefined") return undefined;
-      return queryClient.getQueryData(["initialData"]);
-    },
-    staleTime: 5000,
-    placeholderData: (previous) => previous,
-  });
-
-  const [data, setData] = useState(initialData);
-
   // 페이지 번호에 따라 추가 데이터 로딩
-  const { data: additionalData, isSuccess } = useQuery<TData>({
+  const { data } = useQuery<TData>({
     queryKey: ["pageData", pageNumber],
     queryFn: async () => {
       const response = await fetch(
@@ -35,7 +18,13 @@ export default function NoticeListTable() {
       );
       return response.json();
     },
-    enabled: !!pageNumber,
+    initialData: () => {
+      if (typeof window === "undefined" || pageNumber === undefined)
+        // PROBLEM: 해당 쿼리를 실행하는 주체가 서버인지 브라우저인지 확인하기 위해 typeof window === "undefined"만으로 구분하면, 브라우저에서 첫 로드 시 쿼리가 실행되어 데이터가 바로 갱신됨
+        // SOLVE: pageNumber === undefined 조건을 추가하여, 페이지 번호가 없을 때도 initialData를 사용하도록 했음.
+        // NOTE: 추후 queryString으로 페이지 넘버 가져올 때는 처음 로드할 때도 있을 수 있으므로 페이지가 처음 로드되는 지 아닌지로 조건 바꿔야할 수 있음)
+        return queryClient.getQueryData(["initialData"]);
+    },
     staleTime: 5000,
     placeholderData: (previous) => previous,
   });
@@ -43,12 +32,6 @@ export default function NoticeListTable() {
   const handlePageChange = (page: number) => {
     setPageNumber(page);
   };
-
-  useEffect(() => {
-    if (isSuccess) setData(additionalData);
-  }, [additionalData, isSuccess]);
-
-  if (isInitialLoading) return <div>Loading initial data...</div>;
 
   return (
     <div>
