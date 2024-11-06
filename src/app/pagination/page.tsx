@@ -14,6 +14,7 @@ export default async function Home() {
       return response.json();
     },
   });
+
   const dehydratedState = dehydrate(queryClient);
 
   return (

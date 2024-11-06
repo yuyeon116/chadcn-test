@@ -1,29 +1,33 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TData } from "@/types/data-type";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function NoticeListTable() {
+  // 1. current QueryClient instance 가져오기
   const queryClient = useQueryClient();
-  const [pageNumber, setPageNumber] = useState(1);
+
+  const [pageNumber, setPageNumber] = useState<number | undefined>(undefined);
 
   // 초기 데이터 로딩
   const { data: initialData, isLoading: isInitialLoading } = useQuery<TData>({
-    queryKey: ["pageData", pageNumber],
+    queryKey: ["initialData"],
     queryFn: async () => {
       const response = await fetch("http://date.jsontest.com/");
       return response.json();
     },
     initialData: () => {
       if (typeof window === "undefined") return undefined;
-      return queryClient.getQueryData(["pageData", pageNumber]);
+      return queryClient.getQueryData(["initialData"]);
     },
     staleTime: 5000,
     placeholderData: (previous) => previous,
   });
 
+  const [data, setData] = useState(initialData);
+
   // 페이지 번호에 따라 추가 데이터 로딩
-  const { data: additionalData } = useQuery<TData>({
+  const { data: additionalData, isSuccess } = useQuery<TData>({
     queryKey: ["pageData", pageNumber],
     queryFn: async () => {
       const response = await fetch(
@@ -31,7 +35,7 @@ export default function NoticeListTable() {
       );
       return response.json();
     },
-    enabled: pageNumber > 1,
+    enabled: !!pageNumber,
     staleTime: 5000,
     placeholderData: (previous) => previous,
   });
@@ -40,28 +44,17 @@ export default function NoticeListTable() {
     setPageNumber(page);
   };
 
+  useEffect(() => {
+    if (isSuccess) setData(additionalData);
+  }, [additionalData, isSuccess]);
+
   if (isInitialLoading) return <div>Loading initial data...</div>;
 
   return (
     <div>
-      {/* Render initial data on page 1 */}
-      {pageNumber === 1 && initialData && (
-        <>
-          <h1>{initialData.date}</h1>
-          <p>{initialData.time}</p>
-          <p>{initialData.milliseconds_since_epoch}</p>
-        </>
-      )}
-
-      {/* Render additional data for other pages */}
-      {pageNumber > 1 && additionalData && (
-        <div>
-          <h1>{additionalData.date}</h1>
-          <p>{additionalData.time}</p>
-          <p>{additionalData.milliseconds_since_epoch}</p>
-        </div>
-      )}
-
+      <h1>{data?.date}</h1>
+      <p>{data?.milliseconds_since_epoch}</p>
+      <p>{data?.time}</p>
       <hr />
       <div>
         {/* Pagination buttons */}
