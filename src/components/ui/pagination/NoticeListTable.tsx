@@ -9,7 +9,7 @@ export default function NoticeListTable() {
 
   const [pageNumber, setPageNumber] = useState<number | undefined>(undefined);
 
-  // 페이지 번호에 따라 추가 데이터 로딩
+  // 2. 페이지 번호에 따라 추가 데이터 로딩
   const { data } = useQuery<TData>({
     queryKey: ["pageData", pageNumber],
     queryFn: async () => {
@@ -18,6 +18,7 @@ export default function NoticeListTable() {
       );
       return response.json();
     },
+    // 3. 이 때 페이지 단에서 prefetching했던 데이터를 페이지 로드 전 불러올 데이터의 초기 데이터로 설정
     initialData: () => {
       if (typeof window === "undefined" || pageNumber === undefined)
         // PROBLEM: 해당 쿼리를 실행하는 주체가 서버인지 브라우저인지 확인하기 위해 typeof window === "undefined"만으로 구분하면, 브라우저에서 첫 로드 시 쿼리가 실행되어 데이터가 바로 갱신됨
@@ -26,7 +27,7 @@ export default function NoticeListTable() {
         return queryClient.getQueryData(["initialData"]);
     },
     staleTime: 5000,
-    placeholderData: (previous) => previous,
+    placeholderData: (previous) => previous, // loading 등 깜빡임 현상을 방지하기 위해 이전 데이터를 placeholder data로 활용
   });
 
   const handlePageChange = (page: number) => {
@@ -40,11 +41,9 @@ export default function NoticeListTable() {
       <p>{data?.time}</p>
       <hr />
       <div>
-        {/* Pagination buttons */}
         <button onClick={() => handlePageChange(1)}>1페이지</button>
         <button onClick={() => handlePageChange(2)}>2페이지</button>
         <button onClick={() => handlePageChange(3)}>3페이지</button>
-        {/* 필요한 만큼 페이지 버튼 추가 */}
       </div>
     </div>
   );
